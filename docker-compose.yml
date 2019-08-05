@@ -1,0 +1,85 @@
+version: "3.7"
+
+services:
+  app:
+    image: ecommercer
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    command: yarn dev
+    environment:
+      - DB_HOST=postgres
+      - MONGO_HOST=mongo
+      - REDIS_HOST=redis
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=1025
+      - MAIL_USER=${DB_NAME}
+      - MAIL_PASS=${DB_PASS}
+    volumes:
+      - ".:/usr/app"
+
+
+  postgres:
+    image: postgres:alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+
+  mongo:
+    image: mongo
+
+  postgres:
+    image: postgres:11.2-alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/gobarber.sql
+      - postgres:/var/lib/postgresql/data
+
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: ${DB_PASS}
+    restart: unless-stopped
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin:/root/.pgadmin
+
+  queue:
+    build: .
+    command: yarn queue
+    environment:
+      - DB_HOST=postgres
+      - MONGO_HOST=mongo
+      - REDIS_HOST=redis
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=1025
+      - MAIL_USER=
+      - MAIL_PASS=
+    volumes:
+      - ".:/usr/app"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+
+volumes:
+  postgres:
+  pgadmin:

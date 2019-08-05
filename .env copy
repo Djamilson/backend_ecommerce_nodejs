@@ -1,0 +1,52 @@
+DB_KEY=
+DB_LOGIN=
+
+USER_EMAIL=
+
+CLIENTID_EMAIL=
+CLIENTSECRET_EMAIL=
+REFRESHTOKEN_EMAIL=
+
+
+AWS_REGION=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+TO_EMAIL="Your Name <>"
+FROM_EMAIL="My Name <>"
+
+
+APP_URL=http://localhost:3000
+NODE_ENV=development
+# Auth
+
+APP_SECRET=
+
+# Database
+
+DB_HOST=localhost
+DB_USER=
+DB_PASS=
+DB_NAME=
+
+
+# Mongo
+
+MONGO_HOST=localhost
+MONGO_PORT=27017
+MONGO_NAME=
+
+
+# Redis
+
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+
+# Mail
+
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USER=
+MAIL_PASS=
+
+# Sentry
+SENTRY_DSN=
