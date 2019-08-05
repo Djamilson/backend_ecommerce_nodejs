@@ -13,8 +13,6 @@ class ProductVariationController {
         'sku',
         'available',
         'variation_name',
-        'price',
-        'price_from',
         'weight',
         'order',
         'product_id',

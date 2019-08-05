@@ -13,8 +13,9 @@ import Banner from '../app/models/Banner';
 import Category from '../app/models/Category';
 import Product from '../app/models/Product';
 import ProductImage from '../app/models/ProductImage';
-import ProductVariation from '../app/models/ProductVariation';
 import CategoryProduct from '../app/models/CategoryProduct';
+import ProductVariation from '../app/models/ProductVariation';
+import Price from '../app/models/Price';
 
 const models = [
   User,
@@ -29,6 +30,7 @@ const models = [
   CategoryProduct,
   ProductImage,
   ProductVariation,
+  Price,
 ];
 
 class Database {
@@ -46,7 +48,7 @@ class Database {
 
   associate() {
     models.forEach(model => {
-      // console.log('Model>>>: ', model);
+      console.log('Model>>>: ', model);
 
       if (model.associate) {
         model.associate(this.connection.models);
