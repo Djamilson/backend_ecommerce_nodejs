@@ -1,0 +1,109 @@
+version: "3.7"
+
+networks:
+  web:
+    external: true
+  proxy:
+    external: true
+  internal:
+    external: false
+
+services:
+  reverse-proxy:
+    image: traefik
+    restart: unless-stopped
+    command: --api --docker --acme.email="djamilson@gmail.com" # Enables the web UI and tells Træfik to listen to docker
+    labels:
+      - traefik.frontend.rule=Host:monitor.ofertadodia.palmas.br
+      - traefik.port=8080
+    networks:
+      - proxy
+    ports:
+      - "80:80"     # The HTTP port
+      - "8080:8080" # The Web UI (enabled by --api)
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $PWD/traefik.toml:/etc/traefik/traefik.toml
+      - $PWD/acme.json:/acme.
+      - /opt/traefik/certs/:/certs/
+
+    container_name: traefik
+    command: --api --docker.exposedbydefault=false
+    #command: -c /dev/null --web --docker --logLevel=INFO
+    # command: --api --api.dashboard=true -c /dev/null --docker.exposedbydefault=false --logLevel=WARN --accessLog --docker.endpoint=unix:///var/run/docker.sock --docker.watch --entryPoints='Name:http Address::80' --defaultentrypoints=http --constraints=tag==web
+    command:
+          - "--docker"
+          - "--docker.domain=ofertadodia.palmas.br"
+          - "--logLevel=DEBUG"
+          - "--api"
+          - "--api.statistics"
+          - "--entryPoints=Name:http Address::80"
+          - "--entryPoints=Name:https Address::443 TLS"
+          - "--docker.endpoint=unix:///var/run/docker.sock"
+          - "--acme=true"
+          - "--acme.entrypoint=https"
+          - "--acme.httpchallenge"
+          - "--acme.httpchallenge.entrypoint=http"
+          - "--acme.domains=ofertadodia.palmas.br"
+          - "--acme.email=djamilson@gmail.com"
+          - "--acme.storage=/tmp/acme.json"
+
+  postgres:
+    labels:
+      - traefik.enable=false
+    networks:
+      - internal
+    restart: always
+
+  app:
+    image: app_gobarber
+    restart: always
+    labels:
+      - "traefik.docker.network=proxy"
+      - "traefik.enable=true"
+      - "traefik.protocol=http"
+      # - "traefik.frontend.headers.forceSTSHeader=true"
+      # - "traefik.frontend.headers.STSSeconds=315360000"
+      # - "traefik.frontend.headers.STSIncludeSubdomains=true"
+      # - "traefik.frontend.headers.STSPreload=true"
+      # - "traefik.frontend.rule=Host:postgres.localhost"
+
+      - "traefik.frontend.rule=PathPrefixStrip:/"
+      - "traefik.port=3000"
+
+    networks:
+      - internal
+      - proxy
+
+  pgadmin-compose:
+    labels:
+      - traefik.enable=true
+      - traefik.backend=pgadmin
+      - traefik.frontend.rule=Host:pgadmin.ofertadodia.palmas.br
+      - traefik.docker.network=web
+      - traefik.frontend.entryPoints= http,https
+      #- traefik.port=8080
+    networks:
+      - internal
+      - web
+
+  #api-2:
+    #image: your-api-2-image
+    #restart: always
+    #networks:
+      #- internal
+      #- proxy
+    #labels:
+      #- "traefik.docker.network=proxy"
+      #- "traefik.enable=true"
+      #- "traefik.frontend.rule=Host:api2.yourdomain.com"
+      #- "traefik.port=80"
+      #- "traefik.protocol=http"
+
+
+secrets:
+  traefik_cert:
+    file: ./certs/cert.pem
+  traefik_key:
+    file: ./certs/key.pem
