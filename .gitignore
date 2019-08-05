@@ -64,5 +64,5 @@ node_modules
 
 tmp/uploads/*
 
-!tmp/uploads/resized/.gitkeep
+!tmp/uploads/.gitkeep
 .env
