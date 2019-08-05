@@ -1,22 +1,13 @@
 import * as Yup from 'yup';
-import CategoryProduct from '../models/CategoryProduct';
 import Product from '../models/Product';
-
-// import Category from '../models/Category';
-
 import ProductVariation from '../models/ProductVariation';
+import CategoryProduct from '../models/CategoryProduct';
+import Price from '../models/Price';
 
 require('dotenv').config();
 
 class CategoryProductController {
   async index(req, res) {
-    const category_products = await CategoryProduct.findAll({
-      attributes: ['category_id', 'product_id'],
-      include: [
-        { model: Product, as: 'product', attributes: ['name', 'description'] },
-      ],
-    });
-
     const product_variations = await ProductVariation.findAll({
       attributes: [
         'id',
@@ -24,14 +15,17 @@ class CategoryProductController {
         'sku',
         'available',
         'variation_name',
-        'price',
-        'price_from',
         'weight',
         'order',
-        'price_id',
       ],
+
       include: [
         { model: Product, as: 'product', attributes: ['name', 'description'] },
+        {
+          model: Price,
+          as: 'price',
+          attributes: ['id', 'price', 'price_from'],
+        },
       ],
     });
 

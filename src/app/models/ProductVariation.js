@@ -8,8 +8,6 @@ class ProductVariation extends Model {
         sku: Sequelize.STRING,
         available: Sequelize.STRING,
         variation_name: Sequelize.STRING,
-        price: Sequelize.FLOAT,
-        price_from: Sequelize.FLOAT,
         weight: Sequelize.INTEGER,
         order: Sequelize.INTEGER,
       },
@@ -21,6 +19,7 @@ class ProductVariation extends Model {
 
   static associate(models) {
     this.belongsTo(models.Product, { foreignKey: 'product_id', as: 'product' });
+    this.belongsTo(models.Price, { foreignKey: 'price_id', as: 'price' });
   }
 }
 
